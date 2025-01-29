@@ -1,12 +1,16 @@
 package com.springboot.blog.service.impl;
 
 import com.springboot.blog.entity.Post;
+import com.springboot.blog.exception.ResourceNotFoundExeception;
 import com.springboot.blog.payload.PostDto;
 import com.springboot.blog.repository.PostRepository;
 import com.springboot.blog.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,9 +32,54 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostDto> getAllPosts(){
-        List<Post> posts = postRepositorty.findAll();
-        return posts.stream().map(post-> mapToDto(post)).collect(Collectors.toList());
+    public List<PostDto> getAllPosts(int pageNo, int pageSize){
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+
+        Page<Post> posts = postRepositorty.findAll(pageable);
+        List<Post> listOfPost = posts.getContent();
+        return listOfPost.stream().map(post-> mapToDto(post)).collect(Collectors.toList());
+    }
+
+    @Override
+    public PostDto getPostById(long id){
+        Post post = postRepositorty.findById(id).orElseThrow(
+                ()-> new ResourceNotFoundExeception(
+                        "Post",
+                        "id",
+                        Long.toString(id)
+                )
+        );
+        return mapToDto(post);
+    }
+
+    @Override
+    public PostDto updatePost(PostDto postDto, long id){
+        Post post = postRepositorty.findById(id).orElseThrow(
+                ()-> new ResourceNotFoundExeception(
+                        "Post",
+                        "id",
+                        Long.toString(id)
+                )
+        );
+
+        post.setTitle(postDto.getTitle());
+        post.setContent(postDto.getContent());
+        post.setDescription(postDto.getDescription());
+
+        Post updatedfPost = postRepositorty.save(post);
+        return mapToDto(updatedfPost);
+    }
+
+    @Override
+    public void deletePostById(long id){
+        Post post = postRepositorty.findById(id).orElseThrow(
+                ()-> new ResourceNotFoundExeception(
+                        "Post",
+                        "id",
+                        Long.toString(id)
+                )
+        );
+        postRepositorty.delete(post);
     }
 
     // Convert Entity to Dto

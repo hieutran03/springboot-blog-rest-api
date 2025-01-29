@@ -25,12 +25,36 @@ public class PostController {
     }
 
     @GetMapping
-    public List<PostDto> getAllPost(){
-        return postService.getAllPosts();
+    public List<PostDto> getAllPost(
+            @RequestParam(value="pageNo", defaultValue = "0", required = false) int pageNo,
+            @RequestParam(value="pageSize", defaultValue = "10", required = false) int pageSize
+    ){
+        return postService.getAllPosts(pageNo, pageSize);
     }
 //    @GetMapping
 //    public ResponseEntity<List<PostDto>> getAllPost(){
 //        return new ResponseEntity<>(postService.getAllPosts(), HttpStatus.OK);
 //    }
 
+    @GetMapping("{id}")
+    public ResponseEntity<PostDto> getPostById(@PathVariable(name="id") long id){
+        return ResponseEntity.ok(postService.getPostById(id));
+    }
+
+    @PutMapping("{id}")
+    public ResponseEntity<PostDto> updatePost(@RequestBody PostDto postDto, @PathVariable(name="id") long id){
+        PostDto postRespone = postService.updatePost(postDto, id);
+        return new ResponseEntity<>(postRespone, HttpStatus.OK);
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<String> deletePostById(@PathVariable(name = "id") long id){
+        postService.deletePostById(id);
+        return new ResponseEntity<>("Post entity deleted successfully", HttpStatus.OK);
+    }
+
+    @GetMapping("chuc-mung-nam-moi")
+    public ResponseEntity<String> getNamMoi(){
+        return new ResponseEntity<>("Chuc mung nam moi- An khang thinh vuong - Doi dao suc khoe - May man ngap tran", HttpStatus.OK);
+    }
 }
