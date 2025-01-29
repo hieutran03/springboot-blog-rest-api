@@ -8,8 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/posts")
 public class PostController {
@@ -26,11 +24,12 @@ public class PostController {
     }
 
     @GetMapping
-    public PostResponse etAllPost(
-            @RequestParam(value="pageNo", defaultValue = "0", required = false) int pageNo,
-            @RequestParam(value="pageSize", defaultValue = "10", required = false) int pageSize
+    public PostResponse getAllPost(
+            @RequestParam(value = "pageNo", defaultValue = "0", required =false) int pageNo,
+            @RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize,
+            @RequestParam(value = "sortBy", defaultValue = "id", required = false) String sortBy
     ){
-        return postService.getAllPosts(pageNo, pageSize);
+        return postService.getAllPosts(pageNo, pageSize, sortBy);
     }
 //    @GetMapping
 //    public ResponseEntity<List<PostDto>> getAllPost(){
